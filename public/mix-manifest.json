@@ -1,0 +1,19 @@
+{
+  "/js/app.js": "/js/app.js",
+  "/js/bla.js": "/js/bla.js",
+  "/js/cpu.js": "/js/cpu.js",
+  "/css/app.css": "/css/app.css",
+  "/js/dial_status.js": "/js/dial_status.js",
+  "/js/extension_status_log.js": "/js/extension_status_log.js",
+  "/js/total.js": "/js/total.js",
+  "/js/vue.js": "/js/vue.js",
+  "/js/log.js": "/js/log.js",
+  "/js/available.js": "/js/available.js",
+  "/js/dial.js": "/js/dial.js",
+  "/js/campaigns.js": "/js/campaigns.js",
+  "/js/dial_status_5.js": "/js/dial_status_5.js",
+  "/js/dial_status_log_5.js": "/js/dial_status_log_5.js",
+  "/js/drag.js": "/js/drag.js",
+  "/js/main.js": "/js/main.js",
+  "/js/mincpu.js": "/js/mincpu.js"
+}
