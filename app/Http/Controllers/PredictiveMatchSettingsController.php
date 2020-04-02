@@ -31,7 +31,7 @@ class PredictiveMatchSettingsController extends BaseCrudController
         $this->views_folder = 'crud';
         $this->model = new PredictiveMatchSetting();
         $this->validation_rules = [
-          'pbx_from_caller_id' => [ 'required', 'regex:(^[0]\d{6,10}$)' ],
+          'pbx_from_caller_id' => [ 'required', 'regex:(^[0]\d{6,10}$)', Rule::unique('predictive_match_settings')->ignore($request->route()->parameter('id')) ],
           'pbx_audio_announce_welcome' => [ 'required' ],
           'pbx_audio_announce_wait' => [ 'required' ],
           'pbx_audio_announce_fallback'  => [ 'required' ],
@@ -39,7 +39,8 @@ class PredictiveMatchSettingsController extends BaseCrudController
           'ocm_token' => [ 'required' ],
           'ocm_sap' => [ 'required' ],
           'ocm_sap_fallback' => [ 'required' ],
-          'crm_peanut_url' => [ 'required', 'url' ],
+          //'crm_peanut_url' => [ 'required', 'url' ],
+          //'crm_peanut_token' => [ 'required' ],
           'crm_peanut_buyer' => [ 'required' ],
           'crm_peanut_campaign_schema' => [ 'required' ],
           'crm_peanut_outcome_id_vs_interested' => [ 'required', 'integer' ],
@@ -57,6 +58,8 @@ class PredictiveMatchSettingsController extends BaseCrudController
             'pbx_audio_announce_welcome' => [ makeFieldSelect($this->audio_library) ],
             'pbx_audio_announce_wait' => [ makeFieldSelect($this->audio_library) ],
             'pbx_audio_announce_fallback'  => [ makeFieldSelect($this->audio_library) ],
+            'crm_peanut_url' => [ makeFieldHidden()],
+            'crm_peanut_token' => [ makeFieldHidden()]
         ];
 
         parent::__construct($request);
@@ -77,6 +80,18 @@ class PredictiveMatchSettingsController extends BaseCrudController
         'created_at',
         'updated_at'
      ];
+   }
+
+
+/**
+   * Called by child class, prepare @save environment
+   * @param Request $request
+   * @param null $id
+   */
+   protected function beforeSave(Request $request, $id = NULL)
+   {
+        $this->input['crm_peanut_url'] = env('CRM_PEANUT_URL');
+        $this->input['crm_peanut_token'] = env('CRM_PEANUT_TOKEN');
    }
 
    /**

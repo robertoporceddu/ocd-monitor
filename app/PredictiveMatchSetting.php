@@ -20,6 +20,7 @@ class PredictiveMatchSetting extends Model
         'ocm_sap_fallback',
         'crm_peanut_url',
         'crm_peanut_buyer',
+        'crm_peanut_token',
         'crm_peanut_campaign_schema',
         'crm_peanut_outcome_id_vs_interested',
     ];

@@ -15,7 +15,7 @@ class CreatePredictiveMatchesTable extends Migration
     {
         Schema::create('predictive_match_settings', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('pbx_from_caller_id');
+            $table->string('pbx_from_caller_id')->unique();
             $table->string('pbx_audio_announce_welcome');
             $table->string('pbx_audio_announce_wait');
             $table->string('pbx_audio_announce_fallback');
@@ -24,6 +24,7 @@ class CreatePredictiveMatchesTable extends Migration
             $table->string('ocm_sap');
             $table->string('ocm_sap_fallback');
             $table->string('crm_peanut_url');
+            $table->string('crm_peanut_token');
             $table->string('crm_peanut_buyer');
             $table->string('crm_peanut_campaign_schema');
             $table->string('crm_peanut_outcome_id_vs_interested');
