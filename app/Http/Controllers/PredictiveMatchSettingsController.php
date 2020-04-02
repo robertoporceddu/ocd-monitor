@@ -53,6 +53,8 @@ class PredictiveMatchSettingsController extends BaseCrudController
             Storage::makeDirectory($this->audio_library_path);
         }
         $this->audio_library = Storage::files($this->audio_library_path);
+        $this->audio_library = array_map(function($i) { return $this->audio_library_path.'/'.pathinfo($i, PATHINFO_FILENAME); }, $this->audio_library);
+        $this->audio_library = array_unique($this->audio_library);
 
         $this->fields_types = [
             'pbx_audio_announce_welcome' => [ makeFieldSelect($this->audio_library) ],
