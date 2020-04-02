@@ -111,6 +111,10 @@ $this->group(['middleware' => ['auth']], function () {
     $this->group(['middleware' => ['check-password']], function() {
         $this->get('/', 'HomeController@index');
 
+        $this->group(['prefix' => 'predictive-match-settings'], function () {
+            createCrudRoute($this, 'PredictiveMatchSettingsController', 'predictive-match-settings');
+        });
+
         $this->group(['prefix' => 'notifications'], function () {
             createCrudRoute($this, 'NotificationController', 'notification');
             $this->get('/to-read', 'NotificationController@toRead');

@@ -24,6 +24,7 @@ class PermissionSeeder extends Seeder
         $this->log();
         $this->notification();
         $this->account();
+        $this->matchSettings();
     }
 
     private function rbac()
@@ -103,6 +104,29 @@ class PermissionSeeder extends Seeder
         $actions = ['get','edit','save'];
         $controllers = [
             'AccountController'
+        ];
+
+        foreach ($controllers as $controller){
+            foreach ($actions as $action) {
+                $permissions[] = [
+                    'name' => $controller . '@' . $action,
+                    'slug' => normalize_name($controller . '@' . $action),
+                    'description' => '',
+                    'model' => $controller . '@' . $action,
+                    'created_at' => \Carbon\Carbon::now()
+                ];
+            }
+        }
+
+        DB::table('permissions')->insert($permissions);
+    }
+
+    private function matchSettings()
+    {
+        $permissions = [];
+        $actions = ['index','search','async','insert','get','edit','delete','destroy','restore','download','trash','save'];
+        $controllers = [
+            'PredictiveMatchSettingsController'
         ];
 
         foreach ($controllers as $controller){

@@ -1,0 +1,49 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class DummyClass extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('DummyTable', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('file_id');
+            $table->integer('rows_count')->nullable();
+            $table->integer('rows_inserted')->nullable();
+            $table->string('from');
+            $table->string('status');
+            $table->longText('note')->nullable();
+            $table->dateTime('completed_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
+        });
+
+        Schema::table('<BATCH IMPORT TABLE REFERENCES>', function (Blueprint $table) {
+            $table->string('batch_import_id')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('DummyTable');
+
+        Schema::table('<BATCH IMPORT TABLE REFERENCES>', function (Blueprint $table) {
+            $table->dropColumn('batch_import_id');
+        });
+    }
+}

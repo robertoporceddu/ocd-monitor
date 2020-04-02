@@ -33,7 +33,7 @@
         <ul class="sidebar-menu">
             <li class="header">Menù</li>
 
-
+{{--
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/extensionshome"><i class='fa fa-users'></i> <span>Coda Operatori</span><i class="fa fa-angle-left pull-right"></i></a>
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/availablegenerale"><i class='fa fa-users'></i> <span>Available Extensions</span><i class="fa fa-angle-left pull-right"></i></a>
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/dial_5"><i class='fa fa-users'></i> <span>Andamento Campagne</span><i class="fa fa-angle-left pull-right"></i></a>
@@ -41,26 +41,32 @@
             <li class="header">Server</li>
 
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/generale"><i class='fa fa-users'></i> <span>Cpu Usage & Log</span><i class="fa fa-angle-left pull-right"></i></a>
-
+--}}
             <li class="header">{{ trans('messages.settings') }}</li>
+            <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/predictive-match-settings"><i class='fa fa-cog'></i> <span>Predictive Match</span></a>
             <!-- Optionally, you can add icons to the links -->
-            <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="#"><i class='fa fa-users'></i> <span>{{ trans('user.management') }}</span><i class="fa fa-angle-left pull-right"></i></a>
+{{--
+            <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="#"><i class='fa fa-users'></i> <span>{{ trans('user.management') }}</span></a>
                 <ul class="treeview-menu">
+--}}
                     @if(Auth()->user()->hasPermission('Management\User\UserController@index'))
                         <li class="{{ (isset($resource) and $resource == 'user') ? 'active' : '' }}"><a href="{{ action('Management\User\UserController@index') }}"><i class='fa fa-circle'></i> <span>{{ trans('user.users') }}</span></a></li>
                     @endif
+
+{{--
                     @if(Auth()->user()->hasPermission('Management\User\RoleController@index'))
                         <li class="{{ (isset($resource) and $resource == 'role') ? 'active' : '' }}"><a href="{{ action('Management\User\RoleController@index') }}"><i class='fa fa-circle'></i> <span>{{ trans('role.roles') }}</span></a></li>
                     @endif
                     @if(Auth()->user()->hasPermission('Management\User\PermissionController@index'))
                         <li class="{{ (isset($resource) and $resource == 'permission') ? 'active' : '' }}"><a href="{{ action('Management\User\PermissionController@index') }}"><i class='fa fa-circle'></i> <span>{{ trans('permission.permissions') }}</span></a></li>
                     @endif
+                    
                 </ul>
             </li>
+--}}
 
 
-
-        @if(Auth()->user()->hasPermission('Management\User\UserController@index'))
+            @if(Auth()->user()->hasPermission('Management\User\UserController@index'))
                 <li class="{{ (isset($resource) and $resource == 'log') ? 'active' : '' }}"><a href="{{ action('Management\LogController@index') }}"><i class='fa fa-archive'></i> <span>{{ trans('log.logs') }}</span></a></li>
             @endif
         </ul><!-- /.sidebar-menu -->

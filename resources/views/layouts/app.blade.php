@@ -11,14 +11,12 @@
             @include('layouts.partials.sidebar')
 
             <div class="content-wrapper" style="overflow: auto;">
-
                 @include('layouts.partials.contentheader')
+                @yield('main-content')
+                
                 <section class="content text-center">
                     @yield('content-octopus')
-
-
                 </section>
-
 
             </div>
 

@@ -46,7 +46,7 @@ class AccountController extends \App\Http\Controllers\Management\User\UserContro
         $this->model = new User();
         $this->validation_rules = [
             'name' => ['required', 'string'],
-            'email' => ['required', 'email', Rule::unique('users')->ignore($request->route()->parameter('id'))],
+        'email' => ['required', 'email'/*, Rule::unique('users')->ignore($request->route()->parameter('id'))*/],
             'password' =>[ 'confirmed', env('PASSWORD_REGEX') ],
             'profile_image' => ['image']
         ];

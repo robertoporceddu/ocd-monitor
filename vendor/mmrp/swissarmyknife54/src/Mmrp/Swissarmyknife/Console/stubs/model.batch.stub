@@ -1,0 +1,15 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Database\Eloquent\Model;
+
+class DummyClass extends Model
+{
+    protected $fillable = ['file_id','rows_count','rows_inserted','from','status','note','completed_at'];
+
+    public function file()
+    {
+        return $this->belongsTo('App\Models\File');
+    }
+}

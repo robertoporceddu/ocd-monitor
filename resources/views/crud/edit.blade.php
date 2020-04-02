@@ -37,7 +37,7 @@
                                 @endif
 
                                 @if(in_array($type->type,['relation']))
-                                    <select class="form-control select-async" data-action="{{ $type->action }}" name="{{ $field }}" id="{{ $field }}" >
+                                    <select class="form-control select-async" data-action="{{ $type->action }}" name="{{ $field . (($type->relation_type == 'belongToMany') ? '[]' : '') }}" id="{{ $field }}" {{ ($type->relation_type == 'belongToMany') ? 'multiple' : '' }} >
                                         <option value=""> -- </option>
                                         @if(app('request')->input($field))
                                             <?php
@@ -45,7 +45,13 @@
                                             ?>
                                             <option value="{{ $autocomplete[0] }}" selected>{{ $autocomplete[1] }}</option>
                                         @elseif(isset($data->$field))
-                                            <option value="{!! $data->$field !!}" selected>{{ $data->{$type->relation}->{$type->attribute} }}</option>
+                                            @if($type->relation_type == 'belongToMany')
+                                                @foreach($data->{$type->relation} as $item)
+                                                    <option value="{!! $item->id !!}" selected>{{ $item->{$type->attribute} }}</option>
+                                                @endforeach
+                                            @else
+                                                <option value="{!! $data->$field !!}" selected>{{ $data->{$type->relation}->{$type->attribute} }}</option>
+                                            @endif
                                         @endif
                                     </select>
                                 @endif
@@ -54,7 +60,7 @@
                                     <select class="form-control" name="{{ $field }}" id="{{ $field }}">
                                         <option value=""> -- </option>
                                         @foreach($type->values as $i => $value)
-                                            <option value="{{ $i }}" {{ (isset($data->$field) and $data->$field == $i) ? 'selected' : '' }}>{{ $value }}</option>
+                                            <option value="{{ $value }}" {{ (isset($data->$field) and $data->$field == $i) ? 'selected' : '' }}>{{ $value }}</option>
                                         @endforeach
                                     </select>
                                 @endif
@@ -62,7 +68,6 @@
                         @else
                             <input type="text" class="form-control" name="{{ $field }}" id="{{ $field }}" placeholder="{!! ($translate_fields) ? trans($resource . '.' . $field) : $field !!}" value="{{ (isset($data->$field)) ? $data->$field : old($field) }}">
                         @endif
-
 
                         @if ($errors->has($field))
                             <span class="help-block">{{ $errors->first($field) }}</span>
@@ -87,23 +92,25 @@
                 @foreach($fields_types[$field] as $type)
                     @if(in_array($fields_types[$field][0]->type,['relation']))
                         $("#{{ $field }}").select2({
+
                             ajax: {
                                 url: $("#{{ $field }}").data('action'),
                                 dataType: 'json',
                                 delay: 250,
+
                                 data: function (params) {
                                     return {
                                         's_name': params.term,
                                     };
                                 },
                                 processResults: function (data, params) {
-                                    console.log(data.data);
-
                                     return{
                                         results: data.data,
                                     };
                                 },
                             },
+//                            tags: true,
+                            tokenSeparators: [','],
                         });
                     @endif
                 @endforeach

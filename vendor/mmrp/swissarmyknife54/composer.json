@@ -1,0 +1,39 @@
+{
+    "name": "mmrp/swissarmyknife54",
+    "description": "Basic Crud Generator with User,Log,Account and Notification Management",
+    "version": "1.0.0-dev",
+    "license": "GPL",
+    "type": "library",
+    "keywords": [],
+    "authors": [
+        {
+            "name": "Matteo Meloni",
+            "email": "matteomelonig@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Roberto Porceddu",
+            "email": "robertoporceddu@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.4",
+        "laravel/framework": "5.4.*",
+        "nesbot/carbon": "*",
+        "maatwebsite/excel": "~2.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mmrp\\Swissarmyknife\\": "src/Mmrp/Swissarmyknife"
+        },
+        "files": [
+            "src/Mmrp/Swissarmyknife/helpers.php"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.0-dev"
+        }
+    }
+}
