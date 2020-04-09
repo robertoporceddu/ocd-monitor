@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Validation\Rule;
-use Mmrp\Swissarmyknife\Controller\BaseCrudController;
-use App\PredictiveMatchSetting;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
-
 use Illuminate\Http\Request;
+use App\PredictiveMatchSetting;
+use Illuminate\Validation\Rule;
+
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Mmrp\Swissarmyknife\Controller\BaseCrudController;
 
 class PredictiveMatchSettingsController extends BaseCrudController
 {

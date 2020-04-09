@@ -60,7 +60,7 @@
                                     <select class="form-control" name="{{ $field }}" id="{{ $field }}">
                                         <option value=""> -- </option>
                                         @foreach($type->values as $i => $value)
-                                            <option value="{{ $value }}" {{ (isset($data->$field) and $data->$field == $i) ? 'selected' : '' }}>{{ $value }}</option>
+                                            <option value="{{ $value }}" {{ (isset($data->$field) and $data->$field == $value) ? 'selected' : '' }}>{{ $value }}</option>
                                         @endforeach
                                     </select>
                                 @endif
