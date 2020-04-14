@@ -32,7 +32,7 @@ class PredictiveMatchSettingsController extends BaseCrudController
         $this->model = new PredictiveMatchSetting();
         $this->validation_rules = [
           'pbx_from_caller_id' => [ 'required', 'regex:(^[0]\d{6,10}$)', Rule::unique('predictive_match_settings')->ignore($request->route()->parameter('id')) ],
-          'pbx_predictive_match_type' => [ 'required' ],
+          'pbx_dialer_match_type' => [ 'required' ],
           'pbx_audio_announce_welcome' => [ 'required' ],
           'pbx_audio_announce_wait' => [ 'required' ],
           'pbx_audio_announce_fallback'  => [ 'required' ],
@@ -64,7 +64,7 @@ class PredictiveMatchSettingsController extends BaseCrudController
             'pbx_audio_announce_welcome' => [ makeFieldSelect($this->audio_library) ],
             'pbx_audio_announce_wait' => [ makeFieldSelect($this->audio_library) ],
             'pbx_audio_announce_fallback'  => [ makeFieldSelect($this->audio_library) ],
-            'pbx_predictive_match_type'  => [ makeFieldSelect(['fallback_only','to_extension_or_fallback']) ],
+            'pbx_dialer_match_type'  => [ makeFieldSelect(['fallback_only','to_extension_or_fallback']) ],
             'crm_peanut_url' => [ makeFieldHidden()],
             'crm_peanut_token' => [ makeFieldHidden()]
         ];
