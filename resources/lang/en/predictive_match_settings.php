@@ -11,6 +11,7 @@ return [
     'pbx_audio_announce_welcome' => 'Audio Welcome',
     'pbx_audio_announce_wait' => 'Audio Attesa',
     'pbx_audio_announce_fallback' => 'Audio Fallback',
+    'pbx_dialer_match_type' => 'PBX Dialer Tipo Match',
     'ocm_url' => 'OCM URL',
     'ocm_token' => 'OCM Token',
     'ocm_sap' => 'OCM SAP',

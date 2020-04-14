@@ -14,9 +14,10 @@ class UpdatePredictiveMatchesTable extends Migration
     public function up()
     {
         Schema::table('predictive_match_settings', function (Blueprint $table) {
-            $table->string('ocm_name')->nullable();
-            $table->string('ocm_surname')->nullable();
-            $table->string('ocm_offer')->nullable();
+            $table->string('ocm_name')->default('xxx');
+            $table->string('ocm_surname')->default('xxx');
+            $table->string('ocm_offer')->default('xxx');
+            $table->string('pbx_dialer_match_type')->default('fallback_only');
         });
     }
 
