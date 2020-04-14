@@ -39,6 +39,9 @@ class PredictiveMatchSettingsController extends BaseCrudController
           'ocm_token' => [ 'required' ],
           'ocm_sap' => [ 'required' ],
           'ocm_sap_fallback' => [ 'required' ],
+          'ocm_name' => [ 'required' ],
+          'ocm_surname' => [ 'required' ],
+          'ocm_offer' => [ 'required' ],
           //'crm_peanut_url' => [ 'required', 'url' ],
           //'crm_peanut_token' => [ 'required' ],
           'crm_peanut_buyer' => [ 'required' ],
@@ -60,6 +63,7 @@ class PredictiveMatchSettingsController extends BaseCrudController
             'pbx_audio_announce_welcome' => [ makeFieldSelect($this->audio_library) ],
             'pbx_audio_announce_wait' => [ makeFieldSelect($this->audio_library) ],
             'pbx_audio_announce_fallback'  => [ makeFieldSelect($this->audio_library) ],
+            //'pbx_predictive_match_type'  => [ makeFieldSelect(['fallback_only','to_extension_or_fallback']) ],
             'crm_peanut_url' => [ makeFieldHidden()],
             'crm_peanut_token' => [ makeFieldHidden()]
         ];
