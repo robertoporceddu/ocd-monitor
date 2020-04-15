@@ -34,8 +34,10 @@
             <li class="header">Menù</li>
 
 
+{{-- 
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/extensionshome"><i class='fa fa-users'></i> <span>Coda Operatori</span></i></a>
-            <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/availablegenerale"><i class='fa fa-users'></i> <span>Available Extensions</span></i></a>
+--}}
+                <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/availablegenerale"><i class='fa fa-users'></i> <span>Available Extensions</span></i></a>
 {{--  
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/dial_5"><i class='fa fa-users'></i> <span>Andamento Campagne</span><i class="fa fa-angle-left pull-right"></i></a>
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/drag"><i class='fa fa-users'></i> <span>Confronta Campagne</span><i class="fa fa-angle-left pull-right"></i></a>
