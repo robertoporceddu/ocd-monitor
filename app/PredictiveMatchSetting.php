@@ -15,6 +15,7 @@ class PredictiveMatchSetting extends Model
         'pbx_audio_announce_wait',
         'pbx_audio_announce_fallback',
         'pbx_dialer_match_type',
+        'pbx_dialer_exten_announcement',
         'ocm_url',
         'ocm_token',
         'ocm_sap',
