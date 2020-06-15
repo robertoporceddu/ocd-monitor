@@ -31,14 +31,19 @@
 
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu">
+ 
             <li class="header">Menù</li>
+            @if(Auth()->user()->hasPermission('PbxQueueMiddlewareSettingsController@index'))
+                <li class="treeview {{ (isset($resource) and $resource == 'pbx_queue_middleware_settings') ? 'active' : '' }}"><a href="/pbx-queue-middleware-settings"><i class='fa fa-cog'></i> <span>Pbx Queue Middlware Settings</span></a>
+            @endif
+            @if(Auth()->user()->hasPermission('PeanutCampaignQueueSettingsController@index'))
+                <li class="treeview {{ (isset($resource) and $resource == 'peanut_campaign_queue_settings') ? 'active' : '' }}"><a href="/peanut-campaign-queue-settings"><i class='fa fa-cog'></i> <span>Peanut Campaign Queue Settings</span></a>
+            @endif
 
-
-{{-- 
+{{--
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/extensionshome"><i class='fa fa-users'></i> <span>Coda Operatori</span></i></a>
---}}
-                <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/availablegenerale"><i class='fa fa-users'></i> <span>Available Extensions</span></i></a>
-{{--  
+
+            <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/availablegenerale"><i class='fa fa-users'></i> <span>Available Extensions</span></i></a>
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/dial_5"><i class='fa fa-users'></i> <span>Andamento Campagne</span><i class="fa fa-angle-left pull-right"></i></a>
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/drag"><i class='fa fa-users'></i> <span>Confronta Campagne</span><i class="fa fa-angle-left pull-right"></i></a>
 
@@ -46,7 +51,9 @@
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/generale"><i class='fa fa-users'></i> <span>Cpu Usage & Log</span><i class="fa fa-angle-left pull-right"></i></a>
 --}}
             <li class="header">{{ trans('messages.settings') }}</li>
-            <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/predictive-match-settings"><i class='fa fa-cog'></i> <span>Predictive Match</span></a>
+            @if(Auth()->user()->hasPermission('PredictiveMatchSettingsController@index'))
+                <li class="treeview {{ (isset($resource) and $resource == 'predictive_match_settings') ? 'active' : '' }}"><a href="/predictive-match-settings"><i class='fa fa-cog'></i> <span>Predictive Match</span></a>
+            @endif
             <!-- Optionally, you can add icons to the links -->
 {{--
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="#"><i class='fa fa-users'></i> <span>{{ trans('user.management') }}</span></a>

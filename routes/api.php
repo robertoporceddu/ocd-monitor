@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,7 +11,18 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+$this->group(['middleware' => ['api-token','permissions']], function () {
+    $this->group(['prefix' => 'peanut'], function () {
+        $this->post('open-customer-data', 'PeanutOpenPopupController@apiOpenCustomerData');
+        $this->get('get-by-extension', 'PeanutOpenPopupController@apiGetCustomerDataByExtension');
+    });
+    $this->group(['prefix' => 'pbx'], function () {
+        $this->group(['prefix' => 'middleware'], function () {
+            $this->group(['prefix' => 'queue'], function () {
+                $this->get('get-number', 'PbxQueueMiddlewareController@getQueueNumber');
+                $this->post('push-call', 'PbxQueueMiddlewareController@pushCall');
+            });
+        });
+    });
 });
 

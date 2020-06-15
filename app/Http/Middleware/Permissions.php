@@ -17,13 +17,28 @@ class Permissions
      */
     public function handle($request, Closure $next)
     {
+        return $next($request);
         $action = str_replace('App\Http\Controllers\\','',$request->route()->getActionName());
+        $user = NULL;
+        $token = $request->header(env('API_KEY_TOKEN', 'ApiKey-Token'));
 
-        $permissions = Auth::user()->allPermissions();
-
-        if ( Auth::check() && (isset($permissions[$action]) ) )
+        if(empty($token))
         {
-            return $next($request);
+            if(Auth::check())
+            {
+                $user = Auth::user();
+            }
+        }
+        else
+        {
+            $user = (new User())->where('client_api_token', $token)->first();
+        }
+
+        if($permissions = $user->allPermissions()) {
+            if($user and isset($permissions[$action]))
+            {
+                return $next($request);
+            }
         }
 
         abort(403);

@@ -8,7 +8,7 @@
 
 
 
-
+/*
 $this->get('/cpu', 'ServerController@home');
 $this->get('/c', function(){
     return exec('top -b -n1 | grep \'Cpu(s):\' | awk \'{print $2}\'');
@@ -84,7 +84,7 @@ $this->get('/campaigns', function(){
 $this->get('/drag', function(){
     return view('layouts/drag');
 });
-
+*/
 
 // Authentication Routes...
 //$this->get('login', 'Auth\LoginController@showLoginForm');
@@ -99,7 +99,7 @@ $this->get('password/reset/{token?}', 'Auth\ResetPasswordController@showResetFor
 $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
 $this->post('password/reset', 'Auth\ResetPasswordController@reset');
 
-$this->group(['middleware' => ['auth']], function () {
+$this->group(['middleware' => ['auth', 'permissions']], function () {
 
 
     $this->group(['prefix' => '/account'], function() {
@@ -113,6 +113,14 @@ $this->group(['middleware' => ['auth']], function () {
 
         $this->group(['prefix' => 'predictive-match-settings'], function () {
             createCrudRoute($this, 'PredictiveMatchSettingsController', 'predictive-match-settings');
+        });
+
+        $this->group(['prefix' => 'peanut-campaign-queue-settings'], function () {
+            createCrudRoute($this, 'PeanutCampaignQueueSettingsController', 'peanut-campaign-queue-settings');
+        });
+
+        $this->group(['prefix' => 'pbx-queue-middleware-settings'], function () {
+            createCrudRoute($this, 'PbxQueueMiddlewareSettingsController', 'pbx-queue-middleware-settings');
         });
 
         $this->group(['prefix' => 'notifications'], function () {

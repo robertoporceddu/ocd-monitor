@@ -13,4 +13,6 @@ return [
     'profile_image' => 'Foto Profilo',
     'client_api_token' => 'Token API',
     'client_token_api_last_update' => 'Token API Aggiornato Il',
+    'roles' => 'Ruoli',
+    'client_api_token' => 'Token',
 ];

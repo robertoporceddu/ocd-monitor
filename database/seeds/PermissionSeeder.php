@@ -12,24 +12,41 @@ class PermissionSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('permissions')->insert([
-            'name' => 'HomeController@index',
-            'slug' => normalize_name('HomeController@index'),
-            'description' => '',
-            'model' => 'HomeController@index',
-            'created_at' => \Carbon\Carbon::now()
-        ]);
-
+        $this->home();
         $this->rbac();
         $this->log();
         $this->notification();
         $this->account();
         $this->matchSettings();
+        $this->pbxQueueMiddlewareSettings();
+        $this->pbxMiddleware();
+        $this->peanutCampaignQueueSettings();
+    }
+
+    private function flushPermissions($controllers, $actions) {
+        foreach ($controllers as $controller) {
+            foreach ($actions as $action) {
+                if(!DB::table('permissions')->where('slug',normalize_name($controller . '@' . $action))->count()) {
+                    DB::table('permissions')->insert([
+                        'name' => $controller . '@' . $action,
+                        'slug' => normalize_name($controller . '@' . $action),
+                        'description' => '',
+                        'model' => $controller . '@' . $action,
+                        'created_at' => \Carbon\Carbon::now()
+                    ]);
+                    echo "Adding $controller@$action Permission\n";
+                }
+            }
+        }
+    }
+
+    private function home()
+    {
+        $this->flushPermissions(['HomeController'], ['index']);
     }
 
     private function rbac()
     {
-        $permissions = [];
         $actions = ['index','search','async','insert','get','edit','delete','destroy','restore','download','trash','save'];
         $controllers = [
             'Management\User\UserController',
@@ -37,110 +54,75 @@ class PermissionSeeder extends Seeder
             'Management\User\PermissionController',
         ];
 
-        foreach ($controllers as $controller){
-            foreach ($actions as $action) {
-                $permissions[] = [
-                    'name' => $controller . '@' . $action,
-                    'slug' => normalize_name($controller . '@' . $action),
-                    'description' => '',
-                    'model' => $controller . '@' . $action,
-                    'created_at' => \Carbon\Carbon::now()
-                ];
-            }
-        }
-
-        DB::table('permissions')->insert($permissions);
+        $this->flushPermissions($controllers, $actions);
     }
 
     private function log()
     {
-        $permissions = [];
         $actions = ['index','search','async','get','delete','destroy','restore','download','trash'];
         $controllers = [
             'Management\LogController',
         ];
 
-        foreach ($controllers as $controller){
-            foreach ($actions as $action) {
-                $permissions[] = [
-                    'name' => $controller . '@' . $action,
-                    'slug' => normalize_name($controller . '@' . $action),
-                    'description' => '',
-                    'model' => $controller . '@' . $action,
-                    'created_at' => \Carbon\Carbon::now()
-                ];
-            }
-        }
-
-        DB::table('permissions')->insert($permissions);
-
+        $this->flushPermissions($controllers, $actions);
     }
 
     private function notification(){
-        $permissions = [];
         $actions = ['index','search','async','get','delete','destroy','restore','download','trash','toRead','viewed'];
         $controllers = [
             'NotificationController'
         ];
 
-        foreach ($controllers as $controller){
-            foreach ($actions as $action) {
-                $permissions[] = [
-                    'name' => $controller . '@' . $action,
-                    'slug' => normalize_name($controller . '@' . $action),
-                    'description' => '',
-                    'model' => $controller . '@' . $action,
-                    'created_at' => \Carbon\Carbon::now()
-                ];
-            }
-        }
-
-        DB::table('permissions')->insert($permissions);
+        $this->flushPermissions($controllers, $actions);
     }
 
     private function account()
     {
-        $permissions = [];
         $actions = ['get','edit','save'];
         $controllers = [
             'AccountController'
         ];
 
-        foreach ($controllers as $controller){
-            foreach ($actions as $action) {
-                $permissions[] = [
-                    'name' => $controller . '@' . $action,
-                    'slug' => normalize_name($controller . '@' . $action),
-                    'description' => '',
-                    'model' => $controller . '@' . $action,
-                    'created_at' => \Carbon\Carbon::now()
-                ];
-            }
-        }
-
-        DB::table('permissions')->insert($permissions);
+        $this->flushPermissions($controllers, $actions);
     }
 
     private function matchSettings()
     {
-        $permissions = [];
         $actions = ['index','search','async','insert','get','edit','delete','destroy','restore','download','trash','save'];
         $controllers = [
             'PredictiveMatchSettingsController'
         ];
 
-        foreach ($controllers as $controller){
-            foreach ($actions as $action) {
-                $permissions[] = [
-                    'name' => $controller . '@' . $action,
-                    'slug' => normalize_name($controller . '@' . $action),
-                    'description' => '',
-                    'model' => $controller . '@' . $action,
-                    'created_at' => \Carbon\Carbon::now()
-                ];
-            }
-        }
+        $this->flushPermissions($controllers, $actions);
+    }
 
-        DB::table('permissions')->insert($permissions);
+    private function pbxQueueMiddlewareSettings()
+    {
+        $actions = ['index','search','async','insert','get','edit','delete','destroy','restore','download','trash','save'];
+        $controllers = [
+            'PbxQueueMiddlewareSettingsController'
+        ];
+
+        $this->flushPermissions($controllers, $actions);
+    }
+
+    private function pbxMiddleware()
+    {
+        $actions = ['store'];
+        $controllers = [
+            'PbxMiddlewareController'
+        ];
+
+        $this->flushPermissions($controllers, $actions);
+    }
+
+    private function peanutCampaignQueueSettings()
+    {
+        $actions = ['index','search','async','insert','get','edit','delete','destroy','restore','download','trash','save'];
+        $controllers = [
+            'PeanutCampaignQueueSettingsController'
+        ];
+
+        $this->flushPermissions($controllers, $actions);
     }
 }

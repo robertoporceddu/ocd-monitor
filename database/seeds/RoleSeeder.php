@@ -12,28 +12,33 @@ class RoleSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('roles')->insert([
-            'name' => 'Root',
-            'slug' => normalize_name('Root'),
-            'created_at' => \Carbon\Carbon::now()
-        ]);
-
-        $attach_permissions = [];
-
-        for($i = 1; $i <= 60; $i++){
-            $attach_permissions[] = [
-               'permission_id' => $i,
-                'role_id' => 1,
+        if(!DB::table('roles')->where('slug',normalize_name('Root'))->count()) {
+            DB::table('roles')->insert([
+                'name' => 'Root',
+                'slug' => normalize_name('Root'),
                 'created_at' => \Carbon\Carbon::now()
-            ];
+            ]);
+            echo "Adding Root Role\n";
         }
 
-        DB::table('permission_role')->insert($attach_permissions);
+        for($i = 1; $i <= DB::table('permissions')->count(); $i++) {
+            if(!DB::table('permission_role')->where('permission_id',$i)->where('role_id',1)->count()) {
+                DB::table('permission_role')->insert([
+                    'permission_id' => $i,
+                    'role_id' => 1,
+                    'created_at' => \Carbon\Carbon::now()
+                ]);
+                echo "Adding Permission $i to Root Role\n";
+            }
+        }
 
-        DB::table('role_user')->insert([
-            'user_id' => 1,
-            'role_id' => 1,
-            'created_at' => \Carbon\Carbon::now()
-        ]);
+        if(!DB::table('role_user')->where('user_id',1)->where('role_id',1)->count()) {
+            DB::table('role_user')->insert([
+                'user_id' => 1,
+                'role_id' => 1,
+                'created_at' => \Carbon\Carbon::now()
+            ]);
+            echo "Associate Root Role with Root User\n";
+        }
     }
 }

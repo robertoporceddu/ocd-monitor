@@ -12,4 +12,6 @@ return [
     'profile_image' => 'Profile Image',
     'api_token' => 'Token API',
     'api_token_last_update' => 'Token API Last Update',
+    'roles' => 'Roles',
+    'client_api_token' => 'Token',
 ];

@@ -11249,7 +11249,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)();
-exports.push([module.i, "\ninput{\n    width: 100%;\n}\ntd:first-letter{\n    text-transform:capitalize;\n}\n", ""]);
+exports.push([module.i, "\ninput{\n    width: 100%;\n}\ntd:first-letter{\n    \n}\n", ""]);
 
 /***/ }),
 
