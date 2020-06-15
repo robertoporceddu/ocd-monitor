@@ -38,8 +38,7 @@ class AuthenticationToken
     {
         return response()->json([
             'code' => 403,
-            'message' => 'ApiKey-Token Missing',
-            'data' => NULL
+            'message' => 'Forbidden, Token Missing',
         ], 403);
     }
 
@@ -51,7 +50,6 @@ class AuthenticationToken
         return response()->json([
             'code' => 403,
             'message' => 'Forbidden',
-            'data' => NULL
         ], 403);
     }
 }
