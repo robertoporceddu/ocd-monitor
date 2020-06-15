@@ -12,10 +12,10 @@
 */
 
 $this->group(['middleware' => ['api-token','permissions']], function () {
-    $this->group(['prefix' => 'peanut'], function () {
-        $this->post('open-customer-data', 'PeanutOpenPopupController@apiOpenCustomerData');
-        $this->get('get-by-extension', 'PeanutOpenPopupController@apiGetCustomerDataByExtension');
-    });
+    // $this->group(['prefix' => 'peanut'], function () {
+    //     $this->post('open-customer-data', 'PeanutOpenPopupController@apiOpenCustomerData');
+    //     $this->get('get-by-extension', 'PeanutOpenPopupController@apiGetCustomerDataByExtension');
+    // });
     $this->group(['prefix' => 'pbx'], function () {
         $this->group(['prefix' => 'middleware'], function () {
             $this->group(['prefix' => 'queue'], function () {

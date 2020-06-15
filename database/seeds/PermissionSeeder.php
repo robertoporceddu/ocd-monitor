@@ -108,9 +108,9 @@ class PermissionSeeder extends Seeder
 
     private function pbxMiddleware()
     {
-        $actions = ['store'];
+        $actions = ['getQueueNumber', 'pushCall'];
         $controllers = [
-            'PbxMiddlewareController'
+            'PbxQueueMiddlewareController'
         ];
 
         $this->flushPermissions($controllers, $actions);

@@ -32,13 +32,13 @@ class RoleSeeder extends Seeder
             }
         }
 
-        if(!DB::table('role_user')->where('user_id',1)->where('role_id',1)->count()) {
-            DB::table('role_user')->insert([
-                'user_id' => 1,
-                'role_id' => 1,
-                'created_at' => \Carbon\Carbon::now()
-            ]);
-            echo "Associate Root Role with Root User\n";
-        }
+        // if(!DB::table('role_user')->where('user_id',1)->where('role_id',1)->count()) {
+        //     DB::table('role_user')->insert([
+        //         'user_id' => 1,
+        //         'role_id' => 1,
+        //         'created_at' => \Carbon\Carbon::now()
+        //     ]);
+        //     echo "Associate Root Role with Root User\n";
+        // }
     }
 }

@@ -17,7 +17,6 @@ class Permissions
      */
     public function handle($request, Closure $next)
     {
-        return $next($request);
         $action = str_replace('App\Http\Controllers\\','',$request->route()->getActionName());
         $user = NULL;
         $token = $request->header(env('API_KEY_TOKEN', 'ApiKey-Token'));
@@ -41,7 +40,14 @@ class Permissions
             }
         }
 
-        abort(403);
+        if ($request->wantsJson()) {
+            return response()->json([ 
+                'code' => 403, 
+                'message' => 'Forbidden',
+            ], 403);
+        } else {
+            abort(403);
+        }
     }
 
 }
