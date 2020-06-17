@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\PbxQueueMiddlewareSetting;
 use App\Http\Requests\PushCallRequest;
 use App\Http\Requests\GetQueueNumberRequest;
+use App\PbxQueueMiddlewareLog;
 use App\PeanutCampaignQueueSetting;
 use App\Services\Peanut\Lead as CrmLead;
 use App\Services\Peanut\PbxCall as CrmPbxCall;
@@ -34,17 +35,21 @@ class PbxQueueMiddlewareController extends Controller
                 'queue' => $queue_number
             ], 200);
         } catch (ClientErrorResponseException $e) {
+            PbxQueueMiddlewareLog::error('getQueueNumber', $request, $e->getResponse()->getStatusCode(), $e->getMessage());
+
             return response()->json([ 
                 'code' => $e->getResponse()->getStatusCode(), 
                 'message' => $e->getMessage(),
                 'inserted' => false 
             ], $e->getResponse()->getStatusCode());
         } catch (\Exception $e) {
+            PbxQueueMiddlewareLog::error('getQueueNumber', $request, $e->getCode(), $e->getMessage());
+
             return response()->json([ 
                 'code' => 500, 
                 'message' => $e->getMessage(),
                 'inserted' => false 
-            ], $e->getCode());
+            ], ($e->getCode() == 0) ? 500 : $e->getCode());
         }
     }
 
@@ -58,7 +63,7 @@ class PbxQueueMiddlewareController extends Controller
     {
         try {
             $settings = PbxQueueMiddlewareSetting::getByFromCallerId($request->input('fromid'));
-            
+
             if(empty($request->input('extension'))) {
                 if(
                     $settings->type == 'inbound' and 
@@ -95,17 +100,21 @@ class PbxQueueMiddlewareController extends Controller
                 'inserted' => true
             ], 200);
         } catch (ClientErrorResponseException $e) {
+            PbxQueueMiddlewareLog::error('pushCall', $request, $e->getResponse()->getStatusCode(), $e->getMessage());
+
             return response()->json([ 
                 'code' => $e->getResponse()->getStatusCode(), 
                 'message' => $e->getMessage(),
                 'inserted' => false 
             ], $e->getResponse()->getStatusCode());
         } catch (\Exception $e) {
+            PbxQueueMiddlewareLog::error('pushCall', $request, $e->getCode(), $e->getMessage());
+
             return response()->json([ 
                 'code' => 500, 
                 'message' => $e->getMessage(),
                 'inserted' => false 
-            ], $e->getCode());
+            ], ($e->getCode() == 0) ? 500 : $e->getCode());
         }
     }
 

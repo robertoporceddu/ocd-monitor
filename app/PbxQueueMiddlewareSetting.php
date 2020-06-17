@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,7 +34,24 @@ class PbxQueueMiddlewareSetting extends Model
 
     public static function getByFromCallerId($from_caller_id)
     {
-        $settings = PbxQueueMiddlewareSetting::where('pbx_from_caller_id', $from_caller_id)->get()->first();
+        $settings = PbxQueueMiddlewareSetting::where('pbx_from_caller_id', 'not like', '%*%')
+                        ->where('pbx_from_caller_id', $from_caller_id)->get()->first();
+
+        if(!$settings) {
+            $query = PbxQueueMiddlewareSetting::where('pbx_from_caller_id', 'like', '%*%');
+
+            switch (env('DB_CONNECTION')) {
+                case 'pgsql': {
+                    $query = $query->whereRaw("'". $from_caller_id . "' ~* pbx_from_caller_id");
+                    break;
+                }
+            }
+
+            if($query = $query->get()->first()) {
+                $settings = $query;
+            }
+        }
+
         if(!$settings) {
             throw new \Exception('fromid not found', 404);
         }

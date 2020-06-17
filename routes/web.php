@@ -123,6 +123,10 @@ $this->group(['middleware' => ['auth', 'permissions']], function () {
             createCrudRoute($this, 'PbxQueueMiddlewareSettingsController', 'pbx-queue-middleware-settings');
         });
 
+        $this->group(['prefix' => 'pbx-queue-middleware-logs'], function () {
+            createCrudRoute($this, 'PbxQueueMiddlewareLogsController', 'pbx-queue-middleware-logs');
+        });
+
         $this->group(['prefix' => 'notifications'], function () {
             createCrudRoute($this, 'NotificationController', 'notification');
             $this->get('/to-read', 'NotificationController@toRead');

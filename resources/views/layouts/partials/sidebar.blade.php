@@ -32,12 +32,15 @@
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu">
  
-            <li class="header">Menù</li>
+            <li class="header">Pbx Queue Middleware</li>
             @if(Auth()->user()->hasPermission('PbxQueueMiddlewareSettingsController@index'))
-                <li class="treeview {{ (isset($resource) and $resource == 'pbx_queue_middleware_settings') ? 'active' : '' }}"><a href="/pbx-queue-middleware-settings"><i class='fa fa-cog'></i> <span>Pbx Queue Middlware Settings</span></a>
+                <li class="treeview {{ (isset($resource) and $resource == 'pbx_queue_middleware_settings') ? 'active' : '' }}"><a href="/pbx-queue-middleware-settings"><i class='fa fa-cog'></i> <span>Middleware Settings</span></a>
+            @endif
+            @if(Auth()->user()->hasPermission('PbxQueueMiddlewareLogsController@index'))
+                <li class="treeview {{ (isset($resource) and $resource == 'pbx_queue_middleware_logs') ? 'active' : '' }}"><a href="/pbx-queue-middleware-logs?o_created_at=desc"><i class='fa fa-archive'></i> <span>Middleware Error Logs</span></a>
             @endif
             @if(Auth()->user()->hasPermission('PeanutCampaignQueueSettingsController@index'))
-                <li class="treeview {{ (isset($resource) and $resource == 'peanut_campaign_queue_settings') ? 'active' : '' }}"><a href="/peanut-campaign-queue-settings"><i class='fa fa-cog'></i> <span>Peanut Campaign Queue Settings</span></a>
+                <li class="treeview {{ (isset($resource) and $resource == 'peanut_campaign_queue_settings') ? 'active' : '' }}"><a href="/peanut-campaign-queue-settings"><i class='fa fa-cog'></i> <span>Peanut Campaign Q Settings</span></a>
             @endif
 
 {{--

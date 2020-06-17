@@ -27,7 +27,7 @@ class PbxQueueMiddlewareSettingsController extends BaseCrudController
         $this->views_folder = 'crud';
         $this->model = new PbxQueueMiddlewareSetting();
         $this->validation_rules = [
-          'pbx_from_caller_id' => [ 'required', 'regex:(^[0]\d{6,10}$)', Rule::unique('pbx_queue_middleware_settings')->ignore($request->route()->parameter('id')) ],
+          'pbx_from_caller_id' => [ 'required', 'regex:(^[0]\d{6,10}\*?$)', Rule::unique('pbx_queue_middleware_settings')->ignore($request->route()->parameter('id')) ],
           'ocm_url' => [ 'required', 'url' ],
           'ocm_token' => [ 'required' ],
           'ocm_sap' => [ 'required' ],
