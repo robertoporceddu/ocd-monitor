@@ -22,7 +22,7 @@ class PbxQueueMiddlewareLog extends Model
     {
         $callerid = $request->input('callerid');
         $to_mask = substr($callerid, strlen($callerid)-3, strlen($callerid));
-        $mask = implode('', array_map(function() { return '*'; }, str_split($to_mask)));
+        for($mask = '' or $i = 0; $i <= strlen($to_mask); $i++ and $mask .= '*');
         $callerid = preg_replace('/'.$to_mask.'$/', $mask, $callerid);
 
         $token = $request->header(env('API_KEY_TOKEN', 'ApiKey-Token'));
