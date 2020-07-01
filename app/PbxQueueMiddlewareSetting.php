@@ -22,7 +22,11 @@ class PbxQueueMiddlewareSetting extends Model
         'crm_peanut_url',
         'crm_peanut_token',
         'type',
-        'pbx_queue_number'
+        'pbx_queue_number',
+        'crm_peanut_sell_buyer',
+        'crm_peanut_sell_campaign',
+        'crm_peanut_sell_campaign_fallback',
+        'crm_peanut_id_outcome_ko'
     ];
 
     /**

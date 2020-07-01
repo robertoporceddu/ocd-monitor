@@ -4,14 +4,14 @@ namespace App\Services\Peanut;
 
 use Guzzle\Http\Client as HttpClient;
 
-class PbxCall
+class PbxCall extends Peanut
 {
-    public static function push($url, $token, $callerid, $extension)
+    public function push($callerid, $extension)
     {
         $http = new HttpClient();
 
         $http = $http->post(
-            $url . '/pbx/push-call?token=' . $token,
+            $this->url . '/pbx/push-call?token=' . $this->token,
             null,
             [
                 'callerid' => $callerid,

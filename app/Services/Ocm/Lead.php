@@ -4,15 +4,15 @@ namespace App\Services\Ocm;
 
 use Guzzle\Http\Client as HttpClient;
 
-class Injection
+class Lead extends Ocm
 {
-    public static function inject($url, $token, $sap, $data)
+    public function inject($sap, $data)
     {
         $http = new HttpClient();
 
         $http = $http->post(
-            $url . '/injection-feed/'. $sap .'/injects',
-            [ 'OCM-ApiKey-Token ' => $token ],
+            $this->url . '/injection-feed/'. $sap .'/injects',
+            [ 'OCM-ApiKey-Token ' => $this->token ],
             $data
         )->send();
 

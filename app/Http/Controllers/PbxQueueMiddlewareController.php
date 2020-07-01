@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\PbxQueueMiddlewareSetting;
 use App\Http\Requests\PushCallRequest;
 use App\Http\Requests\GetQueueNumberRequest;
 use App\PbxQueueMiddlewareLog;
-use App\PeanutCampaignQueueSetting;
-use App\Services\Peanut\Lead as CrmLead;
-use App\Services\Peanut\PbxCall as CrmPbxCall;
-use App\Services\Peanut\InjectionLog as CrmInjectionLog;
-use App\Services\Ocm\Injection as OcmInjection;
+use App\PeanutField13VsPbxQueueNumberSetting;
+use App\Services\Ocm\Ocm;
+use App\Services\Peanut\Peanut;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 
 class PbxQueueMiddlewareController extends Controller
@@ -19,20 +16,26 @@ class PbxQueueMiddlewareController extends Controller
     public function getQueueNumber(GetQueueNumberRequest $request)
     {
         try {
+            $callerid = preg_replace('/^0039|\+39/m', '', strval($request->input('callerid')));
+
             $settings = PbxQueueMiddlewareSetting::getByFromCallerId($request->input('fromid'));
 
             $queue_number = $settings->pbx_queue_number;
 
+            $peanut = new Peanut($settings->crm_peanut_url, $settings->crm_peanut_token);
+            $lastContact = $peanut->injectionLog()->getLastContactByPhone($callerid);
+
             if(
                 $settings->type == 'inbound' and 
-                $override = $this->getSettingsIfLastContactNotIsClosed($settings, $request->input('callerid'))
+                !$lastContact->__isOkOrNew and
+                $override = PeanutField13VsPbxQueueNumberSetting::getByField13($lastContact->field_13)
             ) {
                 $queue_number = $override->pbx_queue_number;
             }
 
             return response()->json([ 
                 'code' => 200, 
-                'queue' => $queue_number
+                'queue' => intval($queue_number)
             ], 200);
         } catch (ClientErrorResponseException $e) {
             PbxQueueMiddlewareLog::error('getQueueNumber', $request, $e->getResponse()->getStatusCode(), $e->getMessage());
@@ -62,38 +65,36 @@ class PbxQueueMiddlewareController extends Controller
     public function pushCall(PushCallRequest $request)
     {
         try {
+            $callerid = preg_replace('/^0039|\+39/m', '', strval($request->input('callerid')));
+
             $settings = PbxQueueMiddlewareSetting::getByFromCallerId($request->input('fromid'));
 
-            if(empty($request->input('extension'))) {
-                if(
-                    $settings->type == 'inbound' and 
-                    $override = $this->getSettingsIfLastContactNotIsClosed($settings, $request->input('callerid'))
-                ) {
-                    $settings->ocm_sap_fallback = $override->ocm_sap_fallback;
-                }
-                
-                $this->ocmFallbackInjection($settings, $request->input('callerid'));
+            $peanut = new Peanut($settings->crm_peanut_url, $settings->crm_peanut_token);
 
-                return response()->json([ 
-                    'code' => 200, 
-                    'inserted' => true
-                ], 200);
+            $lastContact = $peanut->injectionLog()->getLastContactByPhone($callerid);
+
+            if(empty($request->input('extension'))) {
+                $this->fallback($settings, $request, $callerid, $lastContact);
+            } else {
+                $this->{$settings->type}($settings, $request, $callerid, $lastContact);
             }
 
-            $this->{$settings->type}($settings, $request);
-
-            CrmInjectionLog::waitInjection(
-                $settings->crm_peanut_url,
-                $settings->crm_peanut_token,
-                $request->input('callerid')
+            $lead_new_contact = $peanut->injectionLog()->waitInjection($callerid);
+            $lead_other_contacts = $peanut->injectionLog()->getLatestContactsPerBuyerByPhone(
+                $lead_new_contact->customer_data_phone_cli,
+                $lead_new_contact->campaign_buyer,
+                $lead_new_contact->id
             );
 
-            CrmPbxCall::push(
-                $settings->crm_peanut_url,
-                $settings->crm_peanut_token,
-                $request->input('callerid'),
-                $request->input('extension')
-            );
+            $peanut->lead()->copyHistory($lead_other_contacts, $lead_new_contact);
+            $peanut->lead()->setKoOtherContacts($lead_other_contacts, $settings->crm_peanut_id_outcome_ko);
+
+            if(!empty($request->input('extension'))) {
+                $peanut->pbxCall()->push(
+                    $callerid,
+                    $request->input('extension')
+                );
+            }
 
             return response()->json([ 
                 'code' => 200, 
@@ -118,42 +119,60 @@ class PbxQueueMiddlewareController extends Controller
         }
     }
 
-    protected function getSettingsIfLastContactNotIsClosed($settings, $callerid)
+    protected function fallback($settings, $request, $callerid, $lastContact)
     {
-        $lastContact = CrmInjectionLog::getLastContactByPhone($settings->crm_peanut_url, $settings->crm_peanut_token, $callerid);
-
-        $settings = collect([])->first();
-
-        if(!$lastContact->__isClosed) {
-            $settings = PeanutCampaignQueueSetting::getByCampaign($lastContact->campaign_schema);
+        if($settings->type == 'inbound' and !$lastContact->__isOkOrNew) {
+            return $this->peanutCrmFallbackInjection($settings, $lastContact);
         }
-
-        return $settings;
+        
+        return $this->ocmFallbackInjection($settings, $callerid);
     }
 
-    protected function click2call($settings, $request)
+    protected function click2call($settings, $request, $callerid, $lastContact)
     {
-        $this->ocmInjection($settings, $request->input('callerid'));
+        return $this->ocmInjection($settings, $callerid);
     }
 
-    protected function inbound($settings, $request)
+    protected function inbound($settings, $request, $callerid, $lastContact)
     {
-        $callerid = $request->input('callerid');
-
-        $lastContact = CrmInjectionLog::getLastContactByPhone($settings->crm_peanut_url, $settings->crm_peanut_token, $callerid);
-
-        if($lastContact->__isClosed) {
-            $this->ocmInjection($settings, $callerid);
-        } else {
-            $this->peanutCrmInjection($settings, $lastContact);
+        if($lastContact->__isOkOrNew) {
+            return $this->ocmInjection($settings, $callerid);
         }
+
+        return $this->peanutCrmInjection($settings, $lastContact);
+    }
+
+    protected function peanutCrmFallbackInjection($settings, $contact)
+    {
+        $settings->crm_peanut_sell_campaign = $settings->crm_peanut_sell_campaign_fallback;
+
+        return $this->peanutCrmInjection($settings, $contact);
     }
 
     protected function peanutCrmInjection($settings, $contact)
     {
-        CrmLead::inject(
-            $settings->crm_peanut_url,
-            $settings->crm_peanut_token,
+        switch($contact->last_outcome_type) {
+            case 'OP_OK': { $contact->field_13 = 'cli in ok'; break; }
+            case 'OP_KO': { $contact->field_13 = 'cli in ko'; break; }
+            case 'OP_AVAILABLE': { $contact->field_13 = 'cli in nr'; break; }
+            case 'OP_RECALL': { $contact->field_13 = 'cli in recall'; break; }
+            case 'OP_INTERESSED': { $contact->field_13 = 'cli in interested'; break; }
+            default: { break; }
+        }
+
+        if(preg_match('/^BO_.+/',$contact->last_outcome_type)) {
+            $contact->field_13 = 'cli in ok';
+        }
+
+        if($contact->last_outcome_type == 'OP_KO' and preg_match('/invio sms/i',$contact->last_outcome_name)) {
+            $contact->field_13 = 'ctc sms su nr';
+        }
+
+        $peanut = new Peanut($settings->crm_peanut_url, $settings->crm_peanut_token);
+
+        return $peanut->lead()->inject(
+            $settings->crm_peanut_sell_buyer,
+            $settings->crm_peanut_sell_campaign,
             $contact
         );
     }
@@ -167,9 +186,9 @@ class PbxQueueMiddlewareController extends Controller
 
     protected function ocmInjection($settings, $callerid)
     {
-        OcmInjection::inject(
-            $settings->ocm_url,
-            $settings->ocm_token,
+        $ocm = new Ocm($settings->ocm_url, $settings->ocm_token);
+
+        return $ocm->lead()->inject(
             $settings->ocm_sap,
             [ 
                 'name' => $settings->ocm_name,

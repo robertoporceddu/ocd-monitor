@@ -39,9 +39,12 @@
             @if(Auth()->user()->hasPermission('PbxQueueMiddlewareLogsController@index'))
                 <li class="treeview {{ (isset($resource) and $resource == 'pbx_queue_middleware_logs') ? 'active' : '' }}"><a href="/pbx-queue-middleware-logs?o_created_at=desc"><i class='fa fa-archive'></i> <span>Middleware Error Logs</span></a>
             @endif
-            @if(Auth()->user()->hasPermission('PeanutCampaignQueueSettingsController@index'))
-                <li class="treeview {{ (isset($resource) and $resource == 'peanut_campaign_queue_settings') ? 'active' : '' }}"><a href="/peanut-campaign-queue-settings"><i class='fa fa-cog'></i> <span>Peanut Campaign Q Settings</span></a>
+            @if(Auth()->user()->hasPermission('PeanutField13VsPbxQueueNumberSettingsController@index'))
+                <li class="treeview {{ (isset($resource) and $resource == 'peanut_field_13_vs_pbx_queue_settings') ? 'active' : '' }}"><a href="/peanut-field13-vs-queue-number-settings"><i class='fa fa-cog'></i> <span>Peanut Field13 Vs Q Settings</span></a>
             @endif
+            {{-- @if(Auth()->user()->hasPermission('PeanutCampaignQueueSettingsController@index'))
+                <li class="treeview {{ (isset($resource) and $resource == 'peanut_campaign_queue_settings') ? 'active' : '' }}"><a href="/peanut-campaign-queue-settings"><i class='fa fa-cog'></i> <span>Peanut Campaign Q Settings</span></a>
+            @endif --}}
 
 {{--
             <li class="treeview {{ (isset($resource) and in_array($resource,['user','role','permission'])) ? 'active' : '' }}"><a href="/extensionshome"><i class='fa fa-users'></i> <span>Coda Operatori</span></i></a>

@@ -18,6 +18,10 @@ return [
     'crm_peanut_token' => 'Peanut Token',
     'pbx_queue_number' => 'Pbx Queue Number',
     'type' => 'Type',
+    'crm_peanut_sell_buyer' => 'Peanut Sell Buyer',
+    'crm_peanut_sell_campaign' => 'Peanut Sell Campaign',
+    'crm_peanut_sell_campaign_fallback' =>  'Peanut Sell Campaign Fallback',
+    'crm_peanut_id_outcome_ko' =>  'Peanut KO Id Outcome',
     'created_at' => 'Created at',
     'updated_at' => 'Updated at',
     'deleted_at' => 'Deleted at'

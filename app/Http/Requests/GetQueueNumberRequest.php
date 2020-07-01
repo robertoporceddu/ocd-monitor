@@ -24,7 +24,7 @@ class GetQueueNumberRequest extends FormRequest
     public function rules()
     {
         return [
-            'callerid' => [ 'required', 'regex:(^[0,3]\d{6,10}$)' ],
+            'callerid' => [ 'required', 'regex:(^[3,0,\+]\d+$)' ],
             'fromid' => [ 'required', 'regex:(^[0,3]\d{6,10}$)' ]
         ];
     }

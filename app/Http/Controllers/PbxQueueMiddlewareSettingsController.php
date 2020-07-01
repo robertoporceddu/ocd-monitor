@@ -39,6 +39,10 @@ class PbxQueueMiddlewareSettingsController extends BaseCrudController
         //   'crm_peanut_token' => [ 'required' ],
           'type' => [ 'required' ],
           'pbx_queue_number' => [ 'required', 'numeric' ],
+          'crm_peanut_sell_buyer' => [ 'required_if:type,inbound' ],
+          'crm_peanut_sell_campaign' => [ 'required_if:type,inbound' ],
+          'crm_peanut_sell_campaign_fallback' => [ 'required_if:type,inbound' ],
+          'crm_peanut_id_outcome_ko' => [ 'required' ]
         ];
 
         $this->breadcrumbs = [];
@@ -64,6 +68,8 @@ class PbxQueueMiddlewareSettingsController extends BaseCrudController
         'type',
         'ocm_sap',
         'pbx_queue_number',
+        'crm_peanut_sell_buyer',
+        'crm_peanut_sell_campaign',
         'updated_at'
      ];
    }
@@ -91,6 +97,8 @@ class PbxQueueMiddlewareSettingsController extends BaseCrudController
           'type',
           'ocm_sap',
           'pbx_queue_number',
+          'crm_peanut_sell_buyer',
+          'crm_peanut_sell_campaign',
           'updated_at'
         ];
    }

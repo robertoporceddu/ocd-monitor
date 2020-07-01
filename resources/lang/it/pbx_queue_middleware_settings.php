@@ -19,6 +19,10 @@ return [
     'crm_peanut_token' => 'Peanut Token',
     'pbx_queue_number' => 'Pbx Numero Coda',
     'type' => 'Tipo',
+    'crm_peanut_sell_buyer' => 'Peanut Buyer Campagna Vendita',
+    'crm_peanut_sell_campaign' => 'Peanut Campagna Vendita',
+    'crm_peanut_sell_campaign_fallback' =>  'Peanut Campagna Vendita Fallback',
+    'crm_peanut_id_outcome_ko' =>  'Peanut Id Esito KO',
     'created_at' => 'Creato il',
     'updated_at' => 'Aggiornato il',
     'deleted_at' => 'Cancellato il'

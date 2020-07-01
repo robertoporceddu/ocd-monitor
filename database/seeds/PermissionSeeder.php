@@ -22,6 +22,7 @@ class PermissionSeeder extends Seeder
         $this->pbxQueueMiddlewareLogs();
         $this->pbxMiddleware();
         $this->peanutCampaignQueueSettings();
+        $this->peanutField13VsPbxQueueNumberSettings();
     }
 
     private function flushPermissions($controllers, $actions) {
@@ -132,6 +133,16 @@ class PermissionSeeder extends Seeder
         $actions = ['index','search','async','insert','get','edit','delete','destroy','restore','download','trash','save'];
         $controllers = [
             'PeanutCampaignQueueSettingsController'
+        ];
+
+        $this->flushPermissions($controllers, $actions);
+    }
+
+    private function peanutField13VsPbxQueueNumberSettings()
+    {
+        $actions = ['index','search','async','insert','get','edit','delete','destroy','restore','download','trash','save'];
+        $controllers = [
+            'PeanutField13VsPbxQueueNumberSettingsController'
         ];
 
         $this->flushPermissions($controllers, $actions);

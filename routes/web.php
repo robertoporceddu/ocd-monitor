@@ -119,6 +119,10 @@ $this->group(['middleware' => ['auth', 'permissions']], function () {
             createCrudRoute($this, 'PeanutCampaignQueueSettingsController', 'peanut-campaign-queue-settings');
         });
 
+        $this->group(['prefix' => 'peanut-field13-vs-queue-number-settings'], function () {
+            createCrudRoute($this, 'PeanutField13VsPbxQueueNumberSettingsController', 'peanut-field13-vs-queue-number-settings');
+        });
+
         $this->group(['prefix' => 'pbx-queue-middleware-settings'], function () {
             createCrudRoute($this, 'PbxQueueMiddlewareSettingsController', 'pbx-queue-middleware-settings');
         });
