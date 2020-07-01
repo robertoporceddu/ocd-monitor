@@ -152,20 +152,20 @@ class PbxQueueMiddlewareController extends Controller
     protected function peanutCrmInjection($settings, $contact)
     {
         switch($contact->last_outcome_type) {
-            case 'OP_OK': { $contact->field_13 = 'cli in ok'; break; }
-            case 'OP_KO': { $contact->field_13 = 'cli in ko'; break; }
-            case 'OP_AVAILABLE': { $contact->field_13 = 'cli in nr'; break; }
-            case 'OP_RECALL': { $contact->field_13 = 'cli in recall'; break; }
-            case 'OP_INTERESSED': { $contact->field_13 = 'cli in interested'; break; }
+            case 'OP_OK': { $contact->field_14 = 'cli in ok'; break; }
+            case 'OP_KO': { $contact->field_14 = 'cli in ko'; break; }
+            case 'OP_AVAILABLE': { $contact->field_14 = 'cli in nr'; break; }
+            case 'OP_RECALL': { $contact->field_14 = 'cli in recall'; break; }
+            case 'OP_INTERESSED': { $contact->field_14 = 'cli in interested'; break; }
             default: { break; }
         }
 
         if(preg_match('/^BO_.+/',$contact->last_outcome_type)) {
-            $contact->field_13 = 'cli in ok';
+            $contact->field_14 = 'cli in ok';
         }
 
         if($contact->last_outcome_type == 'OP_KO' and preg_match('/invio sms/i',$contact->last_outcome_name)) {
-            $contact->field_13 = 'ctc sms su nr';
+            $contact->field_14 = 'ctc sms su nr';
         }
 
         $peanut = new Peanut($settings->crm_peanut_url, $settings->crm_peanut_token);
