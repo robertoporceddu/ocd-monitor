@@ -58,6 +58,7 @@ class Lead extends Peanut
         $newLead->nominativo = $lead->customer_data_name_cli;
         $newLead->telefono = $lead->customer_data_phone_cli;
         $newLead->supplier = $lead->supplier_name;
+        $newLead->mgm = $lead->mgm ?? null;
         for($i = 1; $i < 20; $i++) {
             $newLead->{'f'.$i} = $lead->{'field_'.$i};
         }

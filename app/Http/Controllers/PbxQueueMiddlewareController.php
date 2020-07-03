@@ -168,6 +168,10 @@ class PbxQueueMiddlewareController extends Controller
             $contact->field_14 = 'ctc sms su nr';
         }
 
+        if(!$contact->__isOkOrNew) {
+            $contact->mgm = true;
+        }
+
         $peanut = new Peanut($settings->crm_peanut_url, $settings->crm_peanut_token);
 
         return $peanut->lead()->inject(
