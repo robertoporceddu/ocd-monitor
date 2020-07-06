@@ -1,14 +1,14 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Services\Ocm\Ocm;
+use App\PbxQueueMiddlewareLog;
+use App\Services\Peanut\Peanut;
 use App\PbxQueueMiddlewareSetting;
+use Illuminate\Support\Facades\Log;
 use App\Http\Requests\PushCallRequest;
 use App\Http\Requests\GetQueueNumberRequest;
-use App\PbxQueueMiddlewareLog;
 use App\PeanutField13VsPbxQueueNumberSetting;
-use App\Services\Ocm\Ocm;
-use App\Services\Peanut\Peanut;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 
 class PbxQueueMiddlewareController extends Controller
@@ -27,7 +27,7 @@ class PbxQueueMiddlewareController extends Controller
 
             if(
                 $settings->type == 'inbound' and 
-                !$lastContact->__isOkOrNew and
+                !($lastContact->__isOk or $lastContact->__hasEmptyHistory) and
                 $override = PeanutField13VsPbxQueueNumberSetting::getByField13($lastContact->field_13)
             ) {
                 $queue_number = $override->pbx_queue_number;
@@ -65,6 +65,8 @@ class PbxQueueMiddlewareController extends Controller
     public function pushCall(PushCallRequest $request)
     {
         try {
+            //Log::info($request->input());
+            
             $callerid = preg_replace('/^0039|\+39/m', '', strval($request->input('callerid')));
 
             $settings = PbxQueueMiddlewareSetting::getByFromCallerId($request->input('fromid'));
@@ -121,7 +123,7 @@ class PbxQueueMiddlewareController extends Controller
 
     protected function fallback($settings, $request, $callerid, $lastContact)
     {
-        if($settings->type == 'inbound' and !$lastContact->__isOkOrNew) {
+        if($settings->type == 'inbound' and !($lastContact->__isOk or $lastContact->__hasEmptyHistory)) {
             return $this->peanutCrmFallbackInjection($settings, $lastContact);
         }
         
@@ -135,7 +137,7 @@ class PbxQueueMiddlewareController extends Controller
 
     protected function inbound($settings, $request, $callerid, $lastContact)
     {
-        if($lastContact->__isOkOrNew) {
+        if($lastContact->__isOk or $lastContact->__hasEmptyHistory) {
             return $this->ocmInjection($settings, $callerid);
         }
 
@@ -168,7 +170,7 @@ class PbxQueueMiddlewareController extends Controller
             $contact->field_14 = 'ctc sms su nr';
         }
 
-        if(!$contact->__isOkOrNew) {
+        if(!($contact->__isOk or $contact->__hasEmptyHistory)) {
             $contact->mgm = true;
         }
 

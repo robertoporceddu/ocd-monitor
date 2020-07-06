@@ -52,14 +52,16 @@ class InjectionLog extends Peanut
         if ($response = json_decode($http->getBody())) {
             if($response->code == 200) {
                 $contact = collect($response->payload->data)->first();
-                $contact->__isClosed = self::isClosed($contact);
-                $contact->__isOkOrNew = self::isOkOrNew($contact);
+                $contact->__isClosed = $this->isClosed($contact);
+                $contact->__isOk = $this->isOk($contact);
+                $contact->__hasEmptyHistory = false;
 
                 return $contact;
             } else if($response->code == 204) {
                 $contact = new stdClass;
-                $contact->__isClosed = true;
-                $contact->__isOkOrNew = true;
+                $contact->__isOk = false;
+                $contact->__isClosed = false;
+                $contact->__hasEmptyHistory = true;
 
                 return $contact;
             } else {
@@ -83,19 +85,32 @@ class InjectionLog extends Peanut
         return $isClosed;
     }
 
-    public function isOkOrNew($contact)
+    // public function isOkOrNew($contact)
+    // {
+    //     $isOkOrNew = false;
+
+    //     if($contact->last_outcome_type ?? null) {
+    //         if ($contact->last_outcome_type == 'OP_OK' or preg_match('/^BO_.+/',$contact->last_outcome_type)) {
+    //             $isOkOrNew = true;
+    //         }
+    //     } else {
+    //         $isOkOrNew = true;
+    //     }
+
+    //     return $isOkOrNew;
+    // }
+
+    public function isOk($contact)
     {
-        $isOkOrNew = false;
+        $isOk = false;
 
         if($contact->last_outcome_type ?? null) {
             if ($contact->last_outcome_type == 'OP_OK' or preg_match('/^BO_.+/',$contact->last_outcome_type)) {
-                $isOkOrNew = true;
+                $isOk = true;
             }
-        } else {
-            $isOkOrNew = true;
         }
 
-        return $isOkOrNew;
+        return $isOk;
     }
 
     public function waitInjection($phone, $searches = 15, $time = 2)

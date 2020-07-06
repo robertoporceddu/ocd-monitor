@@ -69,7 +69,13 @@ class Lead extends Peanut
             [ 'data' => json_encode($lead) ]
         )->send();
 
-        return json_decode($http->getBody()) ?? null;
+        if ($response = json_decode($http->getBody())) {
+            if($response->payload->inserted === false) {
+                throw new \Exception("Peanut CRM: " . json_encode($response->payload->validation), 422);
+            }
+        }
+
+        return $response ?? null;
     }
 
     public function copyHistory($other_contacts, $to_contact)
