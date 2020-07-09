@@ -53,6 +53,13 @@ class Lead extends Peanut
     {
         $http = new HttpClient();
 
+        if(
+            $contact = $this->get($buyer,$schema_name,$lead->customer_data_id) and 
+            isset($contact->customer_data->all->nominativo)
+        ) {
+            $lead->customer_data_name_cli = $contact->customer_data->all->nominativo;
+        }
+
         $newLead = $lead;
         $newLead->id = $lead->ocm_status_id;
         $newLead->nominativo = $lead->customer_data_name_cli;
