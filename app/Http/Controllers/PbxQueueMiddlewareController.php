@@ -10,25 +10,37 @@ use App\Http\Requests\PushCallRequest;
 use App\Http\Requests\GetQueueNumberRequest;
 use App\PeanutField13VsPbxQueueNumberSetting;
 use Guzzle\Http\Exception\ClientErrorResponseException;
+use stdClass;
 
 class PbxQueueMiddlewareController extends Controller
 {
+    protected $peanut;
+
+    protected $contacts;
+
+    protected $settings;
+
+    protected $callerid;
+
+    public function __construct()
+    {
+        $this->callerid = preg_replace('/^0039|\+39/m', '', strval(request()->input('callerid')));
+        $this->contacts = new stdClass();
+    }
+
     public function getQueueNumber(GetQueueNumberRequest $request)
     {
         try {
-            $callerid = preg_replace('/^0039|\+39/m', '', strval($request->input('callerid')));
+            $this->settings = PbxQueueMiddlewareSetting::getByFromCallerId($request->input('fromid'));
+            $this->peanut = new Peanut($this->settings->crm_peanut_url, $this->settings->crm_peanut_token);
+            $this->contacts->last = $this->peanut->injectionLog()->getLastContactByPhone($this->callerid);
 
-            $settings = PbxQueueMiddlewareSetting::getByFromCallerId($request->input('fromid'));
-
-            $queue_number = $settings->pbx_queue_number;
-
-            $peanut = new Peanut($settings->crm_peanut_url, $settings->crm_peanut_token);
-            $lastContact = $peanut->injectionLog()->getLastContactByPhone($callerid);
-
+            $queue_number = $this->settings->pbx_queue_number;
             if(
-                $settings->type == 'inbound' and 
-                !($lastContact->__isOk or $lastContact->__hasEmptyHistory) and
-                $override = PeanutField13VsPbxQueueNumberSetting::getByField13($lastContact->field_13)
+                $this->settings->type == 'inbound' and 
+                !($this->contacts->last->__isOk or $this->contacts->last->__hasEmptyHistory) and
+                ($this->contacts->last->field_13 ?? false) and
+                $override = PeanutField13VsPbxQueueNumberSetting::getByField13($this->contacts->last->field_13)
             ) {
                 $queue_number = $override->pbx_queue_number;
             }
@@ -66,34 +78,42 @@ class PbxQueueMiddlewareController extends Controller
     {
         try {
             //Log::info($request->input());
-            
-            $callerid = preg_replace('/^0039|\+39/m', '', strval($request->input('callerid')));
 
-            $settings = PbxQueueMiddlewareSetting::getByFromCallerId($request->input('fromid'));
+            $this->settings = PbxQueueMiddlewareSetting::getByFromCallerId($request->input('fromid'));
+            $this->peanut = new Peanut($this->settings->crm_peanut_url, $this->settings->crm_peanut_token);
+            $this->contacts->last = $this->peanut->injectionLog()->getLastContactByPhone($this->callerid);
 
-            $peanut = new Peanut($settings->crm_peanut_url, $settings->crm_peanut_token);
+            $isFallback = empty($request->input('extension'));
 
-            $lastContact = $peanut->injectionLog()->getLastContactByPhone($callerid);
-
-            if(empty($request->input('extension'))) {
-                $this->fallback($settings, $request, $callerid, $lastContact);
+            if($isFallback) {
+                if(
+                    $this->settings->type == 'inbound' and
+                    !($this->contacts->last->__isOk or $this->contacts->last->__hasEmptyHistory)
+                ) {
+                    $this->peanutCrmInjectionLastContact('fallback');
+                }
+                
+                $this->ocmInjection('fallback');
             } else {
-                $this->{$settings->type}($settings, $request, $callerid, $lastContact);
+                $this->{$this->settings->type}();
             }
 
-            $lead_new_contact = $peanut->injectionLog()->waitInjection($callerid);
-            $lead_other_contacts = $peanut->injectionLog()->getLatestContactsPerBuyerByPhone(
-                $lead_new_contact->customer_data_phone_cli,
-                $lead_new_contact->campaign_buyer,
-                $lead_new_contact->id
+            $this->contacts->new = $this->peanut->injectionLog()->waitInjection($this->callerid);
+            $this->contacts->others = $this->peanut->injectionLog()->getLatestContactsPerBuyerByPhone(
+                $this->contacts->new->customer_data_phone_cli,
+                $this->contacts->new->campaign_buyer,
+                $this->contacts->new->id
             );
 
-            $peanut->lead()->copyHistory($lead_other_contacts, $lead_new_contact);
-            $peanut->lead()->setKoOtherContacts($lead_other_contacts, $settings->crm_peanut_id_outcome_ko);
+            $this->peanut->lead()->copyHistory($this->contacts->others, $this->contacts->new);
+            $this->peanut->lead()->setKoOtherContacts(
+                $this->contacts->others,
+                $this->settings->crm_peanut_id_outcome_ko
+            );
 
-            if(!empty($request->input('extension'))) {
-                $peanut->pbxCall()->push(
-                    $callerid,
+            if(!$isFallback) {
+                $this->peanut->pbxCall()->push(
+                    $this->callerid,
                     $request->input('extension')
                 );
             }
@@ -121,37 +141,22 @@ class PbxQueueMiddlewareController extends Controller
         }
     }
 
-    protected function fallback($settings, $request, $callerid, $lastContact)
+    protected function click2call()
     {
-        if($settings->type == 'inbound' and !($lastContact->__isOk or $lastContact->__hasEmptyHistory)) {
-            return $this->peanutCrmFallbackInjection($settings, $lastContact);
-        }
-        
-        return $this->ocmFallbackInjection($settings, $callerid);
+        return $this->ocmInjection();
     }
 
-    protected function click2call($settings, $request, $callerid, $lastContact)
+    protected function inbound()
     {
-        return $this->ocmInjection($settings, $callerid);
-    }
-
-    protected function inbound($settings, $request, $callerid, $lastContact)
-    {
-        if($lastContact->__isOk or $lastContact->__hasEmptyHistory) {
-            return $this->ocmInjection($settings, $callerid);
+        if($this->contacts->last->__isOk or $this->contacts->last->__hasEmptyHistory) {
+            return $this->ocmInjection();
         }
 
-        return $this->peanutCrmInjection($settings, $lastContact);
+        $this->contacts->last = $this->peanutAddInboundFieldsDetails($this->contacts->last);
+        return $this->peanutCrmInjectionLastContact();
     }
 
-    protected function peanutCrmFallbackInjection($settings, $contact)
-    {
-        $settings->crm_peanut_sell_campaign = $settings->crm_peanut_sell_campaign_fallback;
-
-        return $this->peanutCrmInjection($settings, $contact);
-    }
-
-    protected function peanutCrmInjection($settings, $contact)
+    protected function peanutAddInboundFieldsDetails($contact)
     {
         switch($contact->last_outcome_type) {
             case 'OP_OK': { $contact->field_14 = 'cli in ok'; break; }
@@ -174,33 +179,42 @@ class PbxQueueMiddlewareController extends Controller
             $contact->mgm = true;
         }
 
-        $peanut = new Peanut($settings->crm_peanut_url, $settings->crm_peanut_token);
+        return $contact;
+    }
+
+    protected function peanutCrmInjectionLastContact($mode = '')
+    {
+
+        $peanut = new Peanut($this->settings->crm_peanut_url, $this->settings->crm_peanut_token);
+
+        $sell_campaign = $this->settings->crm_peanut_sell_campaign;
+        if($mode == 'fallback') {
+            $sell_campaign = $this->settings->crm_peanut_sell_campaign_fallback;
+        }
 
         return $peanut->lead()->inject(
-            $settings->crm_peanut_sell_buyer,
-            $settings->crm_peanut_sell_campaign,
-            $contact
+            $this->settings->crm_peanut_sell_buyer,
+            $sell_campaign,
+            $this->contacts->last
         );
     }
 
-    protected function ocmFallbackInjection($settings, $callerid)
+    protected function ocmInjection($mode = '')
     {
-        $settings->ocm_sap = $settings->ocm_sap_fallback;
+        $ocm = new Ocm($this->settings->ocm_url, $this->settings->ocm_token);
 
-        return $this->ocmInjection($settings, $callerid);
-    }
-
-    protected function ocmInjection($settings, $callerid)
-    {
-        $ocm = new Ocm($settings->ocm_url, $settings->ocm_token);
+        $sap = $this->settings->ocm_sap;
+        if($mode == 'fallback') {
+            $sap = $this->settings->ocm_sap_fallback;
+        }
 
         return $ocm->lead()->inject(
-            $settings->ocm_sap,
+            $sap,
             [ 
-                'name' => $settings->ocm_name,
-                'surname' => $settings->ocm_surname,
-                'offer' => $settings->ocm_sap,
-                'phone' =>  $callerid,
+                'name' => $this->settings->ocm_name,
+                'surname' => $this->settings->ocm_surname,
+                'offer' => $this->settings->ocm_sap,
+                'phone' =>  $this->callerid,
                 'privacy_1' => '1'
             ]
         );

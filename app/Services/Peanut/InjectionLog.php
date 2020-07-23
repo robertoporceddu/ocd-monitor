@@ -119,16 +119,22 @@ class InjectionLog extends Peanut
         $lead = collect([]);
 
         $searches = 0;
+
         while($searches < 15 and !$lead->count()) {
             $response = $http->get(
                 $this->url . '/logs/injection?' . 
                     'q=['.
-                        '["where","customer_data_phone_cli","=","' . $phone . '"],' .
-                        '["wherenull","first_charge_user_username"],' .
-                        '["between","created_at",[' .
-                            '"' . Carbon::now()->subMinutes(2)->toDateTimeString() . '",' .
-                            '"' . Carbon::now()->addMinutes(2)->toDateTimeString() . '"' .
-                        ']]' .
+                        '["whereraw","'.
+                            'customer_data_phone_cli = "' . $phone . '" AND '.
+                            'created_at BETWEEN "' . Carbon::now()->subMinutes(2)->toDateTimeString() . '" AND "' . Carbon::now()->addMinutes(2)->toDateTimeString() . '" AND '. 
+                            '(first_charge_user_username IS NULL OR (first_charge_user_username = "catch.all" AND LOWER(last_outcome_name) LIKE "%duplicata%" ))' .
+                        '"]' .
+                        // '["where","customer_data_phone_cli","=","' . $phone . '"],' .
+                        // '["wherenull","first_charge_user_username"],' .
+                        // '["between","created_at",[' .
+                        //     '"' . Carbon::now()->subMinutes(2)->toDateTimeString() . '",' .
+                        //     '"' . Carbon::now()->addMinutes(2)->toDateTimeString() . '"' .
+                        // ']]' .
                     ']' .
                     '&o=[["updated_at","desc"]]' .
                     '&per_page=1' .
